@@ -5,11 +5,11 @@ var settings = {
   persistence: mosca.persistence.Memory
 };
 
-var moscaServer = new mosca.Server(settings, function() {
+var server = new mosca.Server(settings, function() {
   console.log('Mosca server is up and running')
 });
 
-moscaServer.published = function(packet, client, cb) {
+server.published = function(packet, client, cb) {
   if (packet.topic.indexOf('echo') === 0) {
     return cb();
   }
