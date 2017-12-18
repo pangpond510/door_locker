@@ -1,8 +1,8 @@
-#Door Locker
+## Door Locker
 
 this is a repository for Hardware Synthesis Lab project
 
-###Get Started
+## Get Started
 
 ```
 yarn server
