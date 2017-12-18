@@ -1,6 +1,9 @@
-## Door Locker
+# Door Locker
 
-this is a repository for Hardware Synthesis Lab project
+This is a repository for Hardware Synthesis Lab project. The project is based on:
+  - React the Front-End
+  - Node.JS for the Back-End
+  - Arduino for the components (based on ESP8266)
 
 ## Get Started
 
