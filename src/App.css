@@ -1,28 +1,49 @@
-.App {
+* {
+  box-sizing: border-box;
+}
+
+.app-container {
+  height: 100vh;
+  padding: 40px 140px 50px;
+  overflow: hidden;
+  background-color: #525659;
+}
+
+.app-container::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.door-status-col {
+  float: left;
+  padding : 20px;
+  width: 60%;
+  height: 100%;
+  position: relative;
+  border-radius: 10px 0 0 10px;
+  background-color: #FCFCFC;
+}
+
+.info-col {
+  float: left;
+  padding : 40px;
+  width: 40%;
+  height: 100%;
+  border-radius: 0 10px 10px 0;
+  background-color: #FCFCFC;
+}
+
+.info-container {
+  height: 25%;
   text-align: center;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.info-container p{
+  margin: 10px 0;
 }
 
-.App-header {
-  background-color: #222;
-  height: 150px;
-  padding: 20px;
-  color: white;
-}
-
-.App-title {
-  font-size: 1.5em;
-}
-
-.App-intro {
-  font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.temp-button {
+  padding: 5px;
+  margin: 0 10px;
 }
