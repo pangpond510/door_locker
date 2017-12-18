@@ -1,6 +1,8 @@
+const mosca = require('mosca')
 const express = require('express')
 const http = require('http');
 const socketIo = require('socket.io');
+const mqtt = require('mqtt')
 
 
 // define variables and functions
@@ -19,13 +21,38 @@ const getdate = () => {
 }
 
 
-// create app, server, io 
+// create mosca server
+const mosca_setting = {
+  port: 1883,
+  persistence: mosca.persistence.Memory
+};
+const moscaServer = new mosca.Server(mosca_setting, function() {
+  console.log(`${getdate()} --> Mosca server is up and running`)
+});
+moscaServer.published = function(packet, client, cb) {
+  if (packet.topic.indexOf('echo') === 0) {
+    return cb();
+  }
+  const newPacket = {
+    topic: 'echo/' + packet.topic,
+    payload: packet.payload,
+    retain: packet.retain,
+    qos: packet.qos
+  };
+  console.log(`${getdate()} --> [MOSCA] receive newpacket\n`,newPacket);
+  moscaServer.publish(newPacket, cb);
+}
+
+
+// create app, server, io and mqttClient
 const setting = {
   apiPort : 8080,
+  mqttPort : 1883
 };
 const app = express()
 const server = http.createServer(app);
 const io = socketIo(server);
+const mqttClient = mqtt.connect(`mqtt://localhost:${setting.mqttPort}`,{clientId: "door_locker_server"});
 
 
 // define emit function for socket
@@ -71,6 +98,10 @@ app.post('/control/:option', (req, res) => {
     // emit message to socket.io client
     emit_socket_door();
 
+    // publish message to MQTT client
+    mqttClient.publish('door_locker_server', doorStatus); 
+    console.log(`${getdate()} --> [MQTT] sending door status to nodeMCU`);
+    
     res.send('valid');
   }
   else res.send('invalid');
@@ -95,6 +126,27 @@ io.on('connection', socket => {
   console.log(`${getdate()} --> [SCOKET] sending initial door status`);
   socket.on('disconnect', () => console.log(`${getdate()} --> [SOCKET] client disconnected`));
 });
+
+
+// setup mqttClient
+mqttClient.subscribe('door_locker_nodeMCU');
+mqttClient.on('message', (topic, message) => {
+  if(topic.toString() === 'door_locker_nodeMCU'){
+    const msg = message.toString();
+    console.log(`${getdate()} --> [MQTT] receiving message - ${msg}`);
+    if(msg === 'open' || msg === 'close' || msg === 'unlock' || msg === 'lock'){
+      if(doorStatus === 'lock' && msg === 'close') msg = 'unlock';
+      if(doorStatus === 'open' && msg === 'unlock') msg = 'close';
+      doorStatus = msg;
+      console.log(`${getdate()} --> [MQTT] the door is ${(msg === 'close' ? 'clos' : msg)}ing`);
+      emit_socket_door();
+    }
+    else if(msg === 'noti'){
+      emit_socket_noti();
+    }
+  }
+});
+console.log(`${getdate()} --> starting MQTT client and subscribing to "door_locker"`);
 
 
 // listen
