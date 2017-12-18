@@ -1,0 +1,93 @@
+@keyframes door-anim-lock {
+  0% {transform:rotate(0deg);}
+  100% {transform:rotate(360deg);}
+}
+
+@keyframes door-anim-unlock {
+  0% {transform:rotate(0deg);}
+  100% {transform:rotate(-360deg);}
+}
+
+.circle {
+  border-radius: 50%
+}
+
+.door-status-outer-container {
+  display: table;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.door-status-middle-container {
+  display: table-cell;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.door-symbol {
+  opacity: 0.5;
+  width: 60%;
+  height: 60%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  transition: opacity 1s 2s;
+}
+
+.door-symbol.open {
+  transition: opacity 0.5s;
+  opacity: 0;
+}
+
+.door {
+  width: 40vw;
+  height: 40vw;
+  max-width: 550px;
+  max-height: 550px;
+  margin: 0 auto;
+  vertical-align: middle;
+  position: relative;
+  transition: background-color 1s, border 1s;
+}
+
+.door.lock {
+  animation: door-anim-lock 2s ease-in-out;
+  background-color: #D31603;
+  border: 5px solid #E47367;
+}
+
+.door.unlock {
+  animation: door-anim-unlock 2s ease-in-out;
+  background-color: #21A24A;
+  border: 5px solid #79c792;
+}
+
+.door.open, .door.close {
+  background-color: #21A24A;
+  border: 5px solid #79c792;
+}
+
+.inner {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  transition: all 2s;
+}
+
+.inner.close, .inner.lock, .inner.unlock {
+  width: 0px;
+  height: 0px;
+  border: 0px;
+}
+
+.inner.open {
+  width: 70%;
+  height: 70%;
+  border: 5px solid #79c792;
+}
