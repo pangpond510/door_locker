@@ -7,6 +7,7 @@ const mqtt = require('mqtt')
 
 // define variables and functions
 let doorStatus = 'close';
+let lastNotiTime = null;
 const twodigit = (n) => {
   return n<10 ? '0'+n : n;
 }
@@ -27,7 +28,7 @@ const mosca_setting = {
   persistence: mosca.persistence.Memory
 };
 const moscaServer = new mosca.Server(mosca_setting, function() {
-  console.log(`${getdate()} --> Mosca server is up and running`)
+  //console.log(`${getdate()} --> Mosca server is up and running`)
 });
 moscaServer.published = function(packet, client, cb) {
   if (packet.topic.indexOf('echo') === 0) {
@@ -39,7 +40,7 @@ moscaServer.published = function(packet, client, cb) {
     retain: packet.retain,
     qos: packet.qos
   };
-  console.log(`${getdate()} --> [MOSCA] receive newpacket\n`,newPacket);
+  //console.log(`${getdate()} --> [MOSCA] receive newpacket\n`,newPacket);
   moscaServer.publish(newPacket, cb);
 }
 
@@ -93,10 +94,17 @@ app.post('/control/:option', (req, res) => {
     if(doorStatus === 'lock' && opt === 'close') opt = 'unlock';
     if(doorStatus === 'open' && opt === 'unlock') opt = 'close';
     doorStatus = opt;
-    console.log(`${getdate()} --> [API] the door is ${(opt === 'close' ? 'clos' : opt)}ing`);
+    
 
     // emit message to socket.io client
-    emit_socket_door();
+    if(opt !== 'lock' && opt !=='unlock') {
+      console.log(`${getdate()} --> [API] the door is ${(opt === 'close' ? 'clos' : opt)}ing`);
+      emit_socket_door();
+    }
+    else {
+      console.log(`${getdate()} --> [API] send command to ${opt} the door`);
+      //emit_socket_door();
+    }
 
     // publish message to MQTT client
     mqttClient.publish('door_locker_server', doorStatus); 
@@ -133,16 +141,22 @@ mqttClient.subscribe('door_locker_nodeMCU');
 mqttClient.on('message', (topic, message) => {
   if(topic.toString() === 'door_locker_nodeMCU'){
     const msg = message.toString();
-    console.log(`${getdate()} --> [MQTT] receiving message - ${msg}`);
-    if(msg === 'open' || msg === 'close' || msg === 'unlock' || msg === 'lock'){
-      if(doorStatus === 'lock' && msg === 'close') msg = 'unlock';
-      if(doorStatus === 'open' && msg === 'unlock') msg = 'close';
-      doorStatus = msg;
-      console.log(`${getdate()} --> [MQTT] the door is ${(msg === 'close' ? 'clos' : msg)}ing`);
+    console.log(`${getdate()} --> [MQTT] receiving message - [${topic.toString()}]${msg}`);
+    if(msg === 'O' || msg === 'C' || msg === 'U' || msg === 'L'){
+      if(msg === 'O') doorStatus = 'open';
+      else if(msg === 'C') doorStatus = 'close';
+      else if(msg === 'U') doorStatus = 'unlock';
+      else if(msg === 'L') doorStatus = 'lock';
+      console.log(`${getdate()} --> [MQTT] the door is ${(doorStatus === 'close' ? 'clos' : doorStatus)}ing`);
       emit_socket_door();
     }
-    else if(msg === 'noti'){
-      emit_socket_noti();
+    else if(msg === 'K'){
+      const now = new Date();
+      if(!lastNotiTime || Math.abs((now.getTime()-lastNotiTime.getTime())/1000)>10 )
+      {
+        lastNotiTime = new Date(now);
+        emit_socket_noti();
+      }
     }
   }
 });
