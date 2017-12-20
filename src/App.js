@@ -11,7 +11,8 @@ class App extends Component {
 
     this.state = {
       doorStatus: 'close',
-      notiList: [],
+      doorList: [],
+      knockList: [],
       socketEndPoint: "http://localhost:8080",
       canLock: true,
     };
@@ -44,27 +45,33 @@ class App extends Component {
     socket.on("door-status", msg => {
       const data = JSON.parse(msg);
       let doorNext = this.state.doorStatus;
-      let notiNext = this.state.notiList;
+      let listNext;
       if(data.doorStatus){
         doorNext = data.doorStatus.option;
-        notiNext.unshift({
+        listNext = this.state.doorList
+        listNext.unshift({
           text: `the door is ${(doorNext === 'close' ? 'clos' : doorNext)}ed`,
           time: data.doorStatus.time,
           color: "blue"
         });
+        this.setState({
+          doorStatus: doorNext,
+          doorList: listNext
+        });
       }
       if(data.notification){
-        notiNext.unshift({
+        listNext = this.state.knockList
+        listNext.unshift({
           text: 'someone knocked your door',
           time: data.notification.time,
           color: "orange"
         });
+        this.setState({
+          doorStatus: doorNext,
+          knockList: listNext
+        });
         alert("someone knocked your door");
       }
-      this.setState({
-        doorStatus: doorNext,
-        notiList: notiNext,
-      });
     });
   }
   
@@ -79,7 +86,8 @@ class App extends Component {
             <p className="username-text">username: Norawit_Hempornwisarn</p>
             <p className="location-text">locaiton: Bangkok, Thailand</p>
           </div>
-          <NotiContainer notiList={this.state.notiList} />
+          <NotiContainer notiList={this.state.knockList} header="Knocking Log"/>
+          <NotiContainer notiList={this.state.doorList} header="Door Log"/>
         </div>
       </div>
     );

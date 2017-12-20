@@ -103,7 +103,7 @@ app.post('/control/:option', (req, res) => {
     }
     else {
       console.log(`${getdate()} --> [API] send command to ${opt} the door`);
-      //emit_socket_door();
+      emit_socket_door();
     }
 
     // publish message to MQTT client

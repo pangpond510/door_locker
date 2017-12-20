@@ -5,9 +5,13 @@ import './Noti.css';
 
 class NotiContainer extends Component {
   render() {
-    const { notiList } = this.props;
+    const { notiList, header } = this.props;
     return (
       <div className="card-container">
+        <div className="card-header">
+          {header}
+        </div>
+        <div className="card-list"> 
         {
           notiList.map((e,i) => {
             return (
@@ -15,6 +19,7 @@ class NotiContainer extends Component {
             )
           })
         }
+        </div>
       </div>
     );
   }

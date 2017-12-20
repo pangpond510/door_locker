@@ -1,9 +1,23 @@
 .card-container {
+  height: 40%;
+  margin-bottom: 20px;
+  border-radius: 5px;
+}
+
+.card-list {
   padding: 1px;
   background-color: #F5F5F5;
-  border-radius: 5px;
-  height: 80%;
+  height: 85%;
   overflow: auto;
+}
+
+.card-header {
+  height: 15%;
+  border-radius: 5px 5px 0 0;
+  background-color: #C0C0C0;
+  padding: 8px 5px 5px 20px;
+  font-size: 20px;
+  line-height: 20px;
 }
 
 .card {
