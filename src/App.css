@@ -6,7 +6,7 @@
   height: 100vh;
   padding: 40px 140px 50px;
   overflow: hidden;
-  background-color: #525659;
+  background-color: #111934;
 }
 
 .app-container::after {
@@ -35,15 +35,22 @@
 }
 
 .info-container {
-  height: 25%;
+  height: 20%;
   text-align: center;
-}
-
-.info-container p{
-  margin: 10px 0;
 }
 
 .temp-button {
   padding: 5px;
   margin: 0 10px;
+}
+
+.username-text {
+  color: grey;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.location-text {
+  color: grey;
+  font-size: 15px;
 }

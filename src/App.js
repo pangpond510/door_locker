@@ -13,18 +13,29 @@ class App extends Component {
       doorStatus: 'close',
       notiList: [],
       socketEndPoint: "http://localhost:8080",
+      canLock: true,
     };
 
     this.onLockClick = this.onLockClick.bind(this);
   }
 
   onLockClick() {
-    if(this.state.doorStatus === "open") return;
-    if(this.state.doorStatus === "close" || this.state.doorStatus === "unlock") {
-      fetch(`http://localhost:8080/control/lock`,{method:"post"});
-    }
-    else if(this.state.doorStatus === "lock") {
-      fetch(`http://localhost:8080/control/unlock`,{method:"post"})
+    if(this.state.canLock){
+      if(this.state.doorStatus === "open") return;
+      this.setState({
+        canLock: false,
+      })
+      if(this.state.doorStatus === "close" || this.state.doorStatus === "unlock") {
+        fetch(`http://localhost:8080/control/lock`,{method:"post"});
+      }
+      else if(this.state.doorStatus === "lock") {
+        fetch(`http://localhost:8080/control/unlock`,{method:"post"})
+      }
+      setTimeout(() => {
+        this.setState({
+          canLock: true,
+        })
+      }, 2000);
     }
   }
 
@@ -65,8 +76,8 @@ class App extends Component {
         </div>
         <div className="info-col">
           <div className="info-container">
-            <p>Username : abcdef ghijklmnopqrstuvwxyz</p>
-            <p>Locaiton : Bangkok, Thailand</p>
+            <p className="username-text">username: Norawit_Hempornwisarn</p>
+            <p className="location-text">locaiton: Bangkok, Thailand</p>
           </div>
           <NotiContainer notiList={this.state.notiList} />
         </div>
